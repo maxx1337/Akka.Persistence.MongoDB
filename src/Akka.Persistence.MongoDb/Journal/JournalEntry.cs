@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Akka.Persistence.MongoDb.Journal
 {
@@ -25,5 +26,16 @@ namespace Akka.Persistence.MongoDb.Journal
 
         [BsonElement("Manifest")]
         public string Manifest { get; set; }
+    }
+
+
+    public class JournalCommit
+    {
+        [BsonId]
+        public ObjectId Id { get; set; }
+
+        [BsonElement("Entries")]
+        public JournalEntry[] Entries { get; set; }
+
     }
 }

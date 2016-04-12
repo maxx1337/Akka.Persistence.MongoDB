@@ -47,8 +47,6 @@ namespace Akka.Persistence.MongoDb.Snapshot
             return _collection.InsertOneAsync(snapshotEntry);
         }
 
-        protected override void Saved(SnapshotMetadata metadata) { }
-
         protected override Task DeleteAsync(SnapshotMetadata metadata)
         {
             var builder = Builders<SnapshotEntry>.Filter;
