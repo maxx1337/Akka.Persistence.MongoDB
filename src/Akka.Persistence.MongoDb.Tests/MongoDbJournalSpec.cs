@@ -9,6 +9,7 @@ namespace Akka.Persistence.MongoDb.Tests
     public class MongoDbJournalSpec : JournalSpec
     {
         private static readonly MongoDbRunner Runner = MongoDbRunner.Start(ConfigurationManager.AppSettings[0]);
+        protected override bool SupportsRejectingNonSerializableObjects { get { return false; } }
 
         private static readonly string SpecConfig = @"
         akka.persistence {
@@ -55,7 +56,7 @@ namespace Akka.Persistence.MongoDb.Tests
             new MongoClient(Runner.ConnectionString)
                 .GetDatabase("akkanet")
                 .DropCollectionAsync("EventJournal").Wait();
-            
+
             base.Dispose(disposing);
         }
     }

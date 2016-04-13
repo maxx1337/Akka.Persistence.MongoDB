@@ -69,6 +69,7 @@ namespace Akka.Persistence.MongoDb.Journal
             {
                 var persistentMessages = ((IImmutableList<IPersistentRepresentation>)message.Payload).ToArray();
                 var journalEntries = persistentMessages.Select(ToJournalEntry).ToList();
+
                 await _collection.InsertManyAsync(journalEntries, new InsertManyOptions()
                 {
                     IsOrdered = true
@@ -136,7 +137,14 @@ namespace Akka.Persistence.MongoDb.Journal
 
         private Persistent ToPersistanceRepresentation(JournalEntry entry, IActorRef sender)
         {
-            return new Persistent(entry.Payload, entry.SequenceNr, entry.Manifest, entry.PersistenceId, entry.IsDeleted, sender);
+            return new Persistent(
+                entry.Payload,
+                sequenceNr: entry.SequenceNr,
+                persistenceId: entry.PersistenceId,
+                manifest: entry.Manifest,
+                isDeleted: entry.IsDeleted,
+                sender: sender
+            );
         }
     }
 }
