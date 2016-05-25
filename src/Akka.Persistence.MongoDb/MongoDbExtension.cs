@@ -2,6 +2,7 @@
 using Akka.Actor;
 using Akka.Persistence.MongoDb.Journal;
 using Akka.Persistence.MongoDb.Snapshot;
+using Akka.Persistence.MongoDb.Snapshot.Serializers;
 using MongoDB.Driver;
 
 namespace Akka.Persistence.MongoDb
@@ -46,6 +47,10 @@ namespace Akka.Persistence.MongoDb
 
             var snapshotConfig = system.Settings.Config.GetConfig("akka.persistence.snapshot-store.mongodb");
             SnapshotStoreSettings = new MongoDbSnapshotSettings(snapshotConfig);
+
+            // Add Serializer
+            MongoDB.Bson.Serialization.BsonSerializer.RegisterSerializer<Akka.Persistence.AtLeastOnceDeliverySnapshot>(new AtLeastOnceDeliverySnapshotSerializer());
+            MongoDB.Bson.Serialization.BsonSerializer.RegisterSerializer<UnconfirmedDelivery>(new UnconfirmedDeliverySerializer());
 
             // Create collections
             var connectionString = new MongoUrl(JournalSettings.ConnectionString);

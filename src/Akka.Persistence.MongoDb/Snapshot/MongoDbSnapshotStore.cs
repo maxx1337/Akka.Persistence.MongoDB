@@ -24,7 +24,7 @@ namespace Akka.Persistence.MongoDb.Snapshot
             return
                 _collection
                     .Find(filter)
-                    .SortByDescending(x=>x.SequenceNr)
+                    .SortByDescending(x => x.SequenceNr)
                     .Limit(1)
                     .Project(x => ToSelectedSnapshot(x))
                     .FirstOrDefaultAsync();
@@ -41,10 +41,8 @@ namespace Akka.Persistence.MongoDb.Snapshot
                 Timestamp = metadata.Timestamp.Ticks
             };
 
-            // throws a MongoWriteException if s snapshot with the same PersistenceId and SequenceNr 
-            // is inserted the second time. As @Horusiath pointed out, that's fine, because a second snapshot
-            // without any events in the meantime doesn't make any sense.
-            return _collection.InsertOneAsync(snapshotEntry);
+            var snapshotEntryIdFilter = Builders<SnapshotEntry>.Filter.Eq(f => f.Id, snapshotEntry.Id);
+            return _collection.ReplaceOneAsync(snapshotEntryIdFilter, snapshotEntry, new UpdateOptions() { IsUpsert = true });
         }
 
         protected override Task DeleteAsync(SnapshotMetadata metadata)
@@ -81,7 +79,7 @@ namespace Akka.Persistence.MongoDb.Snapshot
 
             return filter;
         }
-        
+
         private SelectedSnapshot ToSelectedSnapshot(SnapshotEntry entry)
         {
             return
